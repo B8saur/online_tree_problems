@@ -1,2 +1,9 @@
 # Binary
 a.out
+
+# Generated file - input for lp_solve
+lp.txt
+
+# Result of lp_solve
+result.out
+

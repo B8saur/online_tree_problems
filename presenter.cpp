@@ -1,14 +1,39 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define VAR1(x, t) "x_" << x << "_t_" << t
-#define VARE(x, t, e) "x_" << x << "_t_" << t << "_e_" << e
-#define EXTRA(f, t) "f_" << f << "_t_" << t
-#define EDGE(u, v, t) "x_" << u << "_t_" << t << " + " << "x_" << v << "_t_" << t << " <= 1;\n"
-// #define DEPTH 1
-typedef pair<int, int> pie;         //{parent, child}, parent < child
-const int noParent = -1;
 
+const int DEPTH = 2;
+
+
+typedef pair<int, int> pie;         //{parent, child}, parent < child
+const int noNode = -1;
+
+
+string NORMAL(int x, int t) {
+    return "x_" + to_string(x) + "_t_" + to_string(t);
+}
+string EDGE(string u, string v) {
+    return u + " + " + v + " <= 1;\n";
+}
+string BRANCHED(int x, int t, vector<int> &branches, int last = noNode) {
+    string result = "x_" + to_string(x) + "_t_" + to_string(t);
+    for(auto a : branches)
+        result += "_e_" + to_string(a);
+    if(last != noNode)
+        result += "_e_" + to_string(last);
+    return result;
+}
+string EXTRA(int depth, int t, vector<int> &branches, int last = noNode) {
+    string result = "d_" + to_string(depth) + "_t_" + to_string(t);
+    for(auto a : branches)
+        result += "_e_" + to_string(a);
+    if(last != noNode)
+        result += "_e_" + to_string(last);
+    return result;
+}
+string BUF(int depth) {
+    return string(2*depth, ' ');
+}
 struct node {
     int notTaken;
     int best;
@@ -39,16 +64,15 @@ vector<pie> input() {
     for(auto &p : edges)
         cin >> p.first >> p.second;         //assumes both in {0, ..., n}
 
-    //old output
     cout << "max: score;\n";
     //monotonicity of 'main tree'
     for(int v=0; v<=n; v++)
-        cout << VAR1(v, 0) << " <= 1;\n";
+        cout << NORMAL(v, 0) << " <= 1;\n";
     for(int t=0; t<n; t++)
         for(int v=0; v<=n; v++)
-            cout << VAR1(v, t) << " >= " << VAR1(v, t+1) << ";\n";
+            cout << NORMAL(v, t) << " >= " << NORMAL(v, t+1) << ";\n";
     for(int v=0; v<=n; v++)
-        cout << VAR1(v, n) << " >= 0;\n";
+        cout << NORMAL(v, n) << " >= 0;\n";
     cout << "\n\n";
 
     return edges;
@@ -65,38 +89,59 @@ void recalculateNode(int cur, vector<node> &nodes) {
 void updateIS(vector<node> &nodes) {
     int cur = nodes.size()-1;
     nodes[nodes[cur].parent].children.push_back(cur);
-    while(cur != noParent) {
+    while(cur != noNode) {
         recalculateNode(cur, nodes);
         cur = nodes[cur].parent;
     }
 }
-void extraPaths(vector<node> &nodes, int turn) {
-    turn++;
+void extraPaths(vector<node> &nodes, int turn, vector<int> branches, int skip = noNode) {
     for(int i=0; i<nodes.size(); i++) {
+        if(i == skip)
+            continue;
+
         nodes.push_back(i);         //add extra
         updateIS(nodes);
+        int depth = branches.size()+1;
 
-        //main nodes in new timeline
-        for(int j=0; j<nodes.size()-1; j++) {
-            //this is already upper limit for the node in new timeline, no need to limit by 1
-            cout << VAR1(j, turn-1) << " >= " << VARE(j, turn, i) << ";\n";
-            cout << VARE(j, turn, i) << " >= 0;\n";
-        }
-        //new temporary node
-        cout << EXTRA(i, turn) << " <= 1;\n";
-        cout << EXTRA(i, turn) << " >= 0;\n";
-        //edge from it
-        cout << VARE(i, turn, i) << " + " << EXTRA(i, turn) << " <= 1;\n";
+        //monotonicity
+        for(int j=0; j<=turn; j++)          //main nodes
+            cout << BUF(depth) << BRANCHED(j, turn, branches) << " >= " << BRANCHED(j, turn, branches, i) << ";\n";
+        for(int d=1; d<=branches.size(); d++)         //previously added branch nodes
+            cout << BUF(depth) << EXTRA(d, turn, branches) << " >= " << EXTRA(d, turn, branches, i) << ";\n";
+        branches.push_back(i);          //new branch node
+        cout << BUF(depth) << EXTRA(branches.size(), turn, branches) << " <= 1;\n";
+
+        //new edge
+        if(i <= turn)           //connected to one of the main nodes
+            cout << BUF(depth) << EDGE(BRANCHED(i, turn, branches), EXTRA(branches.size(), turn, branches));
+        else                    //connected to an extra node
+            cout << BUF(depth) << EDGE(EXTRA(i-turn, turn, branches), EXTRA(branches.size(), turn, branches));
+
         //independent set
-        for(int j=0; j<nodes.size()-1; j++)
-            cout << VARE(j, turn, i) << " + ";
-        cout << EXTRA(i, turn) << " >= " << nodes[0].best << "*score;\n";
-        cout << "\n";
-
+        cout << BUF(depth);
+        for(int j=0; j<=turn; j++)          //main nodes
+            cout << BRANCHED(j, turn, branches) << " + ";
+        for(int d=1; d<branches.size(); d++)        //branch nodes (all but last)
+            cout << EXTRA(d, turn, branches) << " + ";
+        cout << EXTRA(branches.size(), turn, branches) << " >= " << nodes[0].best << "*score;\n\n";
+        
+        //no more branches from here, need to add lower bounds
+        if(depth == DEPTH) {
+            for(int j=0; j<=turn; j++)          //main nodes
+                cout << BUF(depth+1) << BRANCHED(i, turn, branches) << " >= 0;\n";
+            for(int d=1; d<=branches.size(); d++)         //branch nodes
+                cout << BUF(depth+1) << EXTRA(d, turn, branches) << " >= 0;\n";
+            cout << "\n";
+        }
+        else 
+            extraPaths(nodes, turn, branches);
+            
+        //come back from recursion - remove that added node
+        branches.pop_back();
         nodes.pop_back();           //remove extra
         nodes[i].children.pop_back();
         int cur = i;
-        while(cur != noParent) {
+        while(cur != noNode) {
             recalculateNode(cur, nodes);
             cur = nodes[cur].parent;
         }
@@ -104,22 +149,26 @@ void extraPaths(vector<node> &nodes, int turn) {
 }
 void buildTree(vector<pie> &edges) {
     vector<node> nodes;
-    nodes.emplace_back(noParent);
+    nodes.emplace_back(noNode);
 
     int turn = 1;
-    for(auto [parent, cur] : edges) {
+    
+    for(int i=0; i<edges.size(); i++) {
+        auto [parent, cur] = edges[i];
+        int next = (i<edges.size()-1) ? edges[i+1].first : noNode;
         nodes.emplace_back(parent);
         updateIS(nodes);
         
-        cout << "  " << EDGE(parent, cur, turn);
+        cout << EDGE(NORMAL(parent, turn), NORMAL(cur, turn));  //EDGE(parent, cur, turn);
 
-        cout << "  " << VAR1(0, turn);
+        cout << NORMAL(0, turn);
         for(int i=1; i<nodes.size(); i++)
-            cout << " + " << VAR1(i, turn);
-        cout << " >= " << nodes[0].best << "*score;\n\n";
+            cout << " + " << NORMAL(i, turn);
+        cout << " >= " << nodes[0].best << "*score;\n\n\n";
         
-        //TODO: add extra paths here
-        extraPaths(nodes, turn);
+        //add extra paths here
+        if(DEPTH > 0)
+            extraPaths(nodes, turn, {}, next);
         cout << "\n";
 
         turn++;
