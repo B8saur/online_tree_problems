@@ -1,5 +1,5 @@
 # Independent Set On-line on Trees
-Bachelor's degree-related codes.
+Bachelor's degree-related codes. Now also includes Vertex Cover.
 
 Generated output is formatted as input to `lp_solve`.
 
@@ -8,6 +8,6 @@ Generated output is formatted as input to `lp_solve`.
 - first line contains a single value - number of edges.
 - each following line contains two values - the edge itself. Second should be the number of edge (starting from one), and the first is any vertex less than that (non-negative). This asserts that the graph is in fact a single connected tree (not a forest).
 
-Then use command `make is` to run. Or understand what that command does and do it better.
+Then use command `make is` (or `make vc`) to run. Or understand what that command does and do it better.
 
-Also, `presenter.cpp` contains parameter `depth` - how deep are 'extra branches', that are generated beside the tree given on input. Larger trees may require decreasing this parameter.
+Parameter `depth` means how deep will the extra branches (of tree-generation tree) be.
