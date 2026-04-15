@@ -8,17 +8,14 @@ def powerset(iterable):
     s = list(iterable)
     return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))
 
-edges = [
-    (1,2),
-    (2,3),
-    # (3,4),
-    # (0,1),
-    # (0,'A'),
-    # (4,5),
-    # (5,6),
-    # ('A','B'),
-    # ('B','C')
-]
+n = int(input())
+edges = []
+for i in range(n):
+    while True:
+        edge = input().split()
+        if len(edge) != 0:
+            edges.append(edge)
+            break
 
 edges = [ (str(a),str(b)) for a,b in edges ]
 vertices = sorted(list(set([a for a,b in edges] + [b for a,b in edges])))

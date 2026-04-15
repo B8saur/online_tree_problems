@@ -8,21 +8,24 @@ def powerset(iterable):
     s = list(iterable)
     return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))
 
-n = int(input())
-edges = []
-for i in range(n):
-    while True:
-        edge = input().split()
-        if len(edge) != 0:
-            edges.append(edge)
-            break
+edges = [
+    (1,2),
+    (2,3),
+    (3,4),
+    (1,0),
+    (0,'A'),
+    (4,5),
+    (5,6),
+    ('A','B'),
+    ('B','C')
+]
 
 edges = [ (str(a),str(b)) for a,b in edges ]
 vertices = sorted(list(set([a for a,b in edges] + [b for a,b in edges])))
 rounds = len(edges)
 
 print('min: score;')
-print(f'x_{0}_t_{1} >= x_{1}_t_{1};') 
+print(f'x_{1}_t_{1} >= x_{2}_t_{1};') 
 for v in vertices:
     print(f'x_{v}_t_{0} >= 0;') 
     for r in range(rounds+1):

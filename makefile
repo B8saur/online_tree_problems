@@ -1,16 +1,27 @@
+INPUT = input.in
 TEXTFILE = lp.txt
 BINARY = a.out
 RESULT = result.out
 is:
 	g++ independent.cpp -O3 -o ${BINARY}
-	./${BINARY} < input.in > ${TEXTFILE}
-	cat ${TEXTFILE} | lp_solve > ${RESULT}
+	./${BINARY} < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
 	grep "Value" ${RESULT}
 
 vc:
 	g++ cover.cpp -O3 -o ${BINARY}
-	./${BINARY} < input.in > ${TEXTFILE}
-	cat ${TEXTFILE} | lp_solve > ${RESULT}
+	./${BINARY} < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
+	grep "Value" ${RESULT}
+
+pythonis:
+	python3 is_presenter_lp.py < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
+	grep "Value" ${RESULT}
+
+pythonvc:
+	python3 vc_presenter_lp.py < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
 	grep "Value" ${RESULT}
 
 all: create

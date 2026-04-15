@@ -1,0 +1,21 @@
+Breaking symmetry increases results in `make pythonvc`
+
+`make vc` for 9 edges:
+    DEPTH=0:
+        ATTACK=0: 1.33333333 (repeats for more edges)
+        ATTACK=1: 1.63888889    0m21s
+        ATTACK=2: 1.63888889    0m46s
+    DEPTH=1:
+        ATTACK=0: 1.55555556
+        ATTACK=1: ...takes more than 12 minutes
+    DEPTH=2:
+        ATTACK=0: 1.60000000
+    
+`make vc` for 10 edges:
+    DEPTH=0:
+        ATTACK=1: 1.64864865    1m50s
+        ATTACK=2: 1.64864865    3m37s
+
+`make vc` for 11 edges:
+    DEPTH=0:
+        ATTACK=1: ...takes more than 8 minutes
