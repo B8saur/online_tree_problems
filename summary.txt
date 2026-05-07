@@ -1,4 +1,4 @@
-Breaking symmetry increases results in `make pythonvc`
+Breaking symmetry (SB) increases results
 
 `make vc` for 9 edges:
     DEPTH=0:
@@ -7,14 +7,19 @@ Breaking symmetry increases results in `make pythonvc`
         ATTACK=2: 1.63888889    0m46s
     DEPTH=1:
         ATTACK=0: 1.55555556
-        ATTACK=1: ...takes more than 12 minutes
+        ATTACK=1: 1.64864865    4h22m49s on student
+             SB:  1.67187500    4h27m40s on student
     DEPTH=2:
         ATTACK=0: 1.60000000
     
 `make vc` for 10 edges:
     DEPTH=0:
         ATTACK=1: 1.64864865    1m50s
+             SB:  1.67187500
         ATTACK=2: 1.64864865    3m37s
+    DEPTH=1:
+        ATTACK=1:
+             SB:  1.67647059    1d5h8m27s
 
 `make vc` for 11 edges:
     DEPTH=0:
