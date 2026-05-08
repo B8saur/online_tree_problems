@@ -24,6 +24,16 @@ pythonvc:
 	lp_solve < ${TEXTFILE} > ${RESULT}
 	grep "Value" ${RESULT}
 
+intvc:
+	python3 vc_integer.py < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
+	grep "Value" ${RESULT}
+
+limvc:
+	python3 vc_limited.py < ${INPUT} > ${TEXTFILE}
+	lp_solve < ${TEXTFILE} > ${RESULT}
+	grep "Value" ${RESULT}
+
 all: create
 	cat ${TEXTFILE} | lp_solve
 
